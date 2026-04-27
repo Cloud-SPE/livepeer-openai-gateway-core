@@ -1,6 +1,6 @@
 {
   "name": "@cloudspe/livepeer-openai-gateway-core",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "OSS engine: registry-driven node selection + payment-daemon orchestration + dispatchers + Fastify adapter for an OpenAI-compatible bridge over Livepeer WorkerNodes.",
   "license": "MIT",
   "homepage": "https://github.com/Cloud-SPE/livepeer-openai-gateway-core",
@@ -16,12 +16,13 @@
     "node": ">=20"
   },
   "exports": {
-    ".": "./src/index.ts",
-    "./*": "./src/*"
+    ".": "./dist/index.js",
+    "./*": "./dist/*"
   },
-  "main": "./src/index.ts",
-  "types": "./src/index.ts",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "files": [
+    "dist",
     "src",
     "migrations",
     "examples",
@@ -37,6 +38,7 @@
     "SECURITY.md"
   ],
   "scripts": {
+    "prepublishOnly": "tsc -p tsconfig.json",
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --coverage",
