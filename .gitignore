@@ -1,0 +1,39 @@
+# Node
+node_modules/
+npm-debug.log*
+
+# Build output
+dist/
+*.tsbuildinfo
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# OS
+.DS_Store
+
+# Local config / secrets
+.env
+.env.local
+.env.*.local
+*.key
+*.pem
+
+# Local operator-authored configs (the example/* files are committed).
+examples/minimal-shell/service-registry-config.yaml
+examples/minimal-shell/payment-daemon-config.yaml
+examples/minimal-shell/keystore.json
+examples/minimal-shell/keystore-password
+
+# Logs
+*.log
+logs/
+
+# npm pack output
+*.tgz
