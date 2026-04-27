@@ -1,6 +1,6 @@
 # Contributing
 
-Thanks for your interest in `@cloudspe/livepeer-gateway-core`. This
+Thanks for your interest in `@cloudspe/livepeer-openai-gateway-core`. This
 project is small, agent-first, and pre-1.0 — contributions are welcome
 but the bar for changes that touch the public adapter contracts is
 higher than for internal cleanup.
@@ -10,10 +10,10 @@ higher than for internal cleanup.
 Open a GitHub issue using the [Bug report](.github/ISSUE_TEMPLATE/bug.yml)
 template. The template asks for:
 
-- The `@cloudspe/livepeer-gateway-core` version (`npm ls @cloudspe/livepeer-gateway-core`).
+- The `@cloudspe/livepeer-openai-gateway-core` version (`npm ls @cloudspe/livepeer-openai-gateway-core`).
 - The Node version (`node --version`).
 - A minimal reproduction — smallest code that triggers the bug. A
-  failing test against `@cloudspe/livepeer-gateway-core/service/billing/inMemoryWallet.js`
+  failing test against `@cloudspe/livepeer-openai-gateway-core/service/billing/inMemoryWallet.js`
   is best.
 - Expected vs. actual behavior.
 
@@ -38,8 +38,8 @@ review cost is too high to merge speculative work.
 ## Dev setup
 
 ```sh
-git clone https://github.com/Cloud-SPE/livepeer-gateway-core.git
-cd livepeer-gateway-core
+git clone https://github.com/Cloud-SPE/livepeer-openai-gateway-core.git
+cd livepeer-openai-gateway-core
 npm install
 npm test
 npm run lint

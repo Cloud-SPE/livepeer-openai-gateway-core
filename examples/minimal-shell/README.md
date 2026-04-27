@@ -1,6 +1,6 @@
 # minimal-shell
 
-The smallest runnable wiring of `@cloudspe/livepeer-gateway-core`.
+The smallest runnable wiring of `@cloudspe/livepeer-openai-gateway-core`.
 Boots a Fastify server on `:8080`, accepts
 `POST /v1/chat/completions`, dispatches to the worker pool, and
 returns OpenAI-shaped responses.
@@ -89,16 +89,16 @@ config doesn't list any node advertising `llama-3.3-70b` for the
   a real bearer-token / mTLS / API-key resolver in your own shell.
 - **Streaming chat** — the example only registers
   `/v1/chat/completions` (non-streaming). Streaming is at
-  `@cloudspe/livepeer-gateway-core/runtime/http/chat/streaming.js`
+  `@cloudspe/livepeer-openai-gateway-core/runtime/http/chat/streaming.js`
   and follows the same wiring pattern.
 - **Embeddings, images, audio** — same deal, register the routes
-  from `@cloudspe/livepeer-gateway-core/runtime/http/{embeddings,
+  from `@cloudspe/livepeer-openai-gateway-core/runtime/http/{embeddings,
   images, audio}/` if you need them.
 - **Metrics** — the example uses `NoopRecorder`. For production
   metrics, swap in `PrometheusRecorder` and register
   `createMetricsServer` on a separate port.
 - **Operator dashboard** — register
-  `@cloudspe/livepeer-gateway-core/dashboard` if you want the
+  `@cloudspe/livepeer-openai-gateway-core/dashboard` if you want the
   read-only `/admin/ops` view; wire `createBasicAdminAuthResolver`
   for token auth.
 

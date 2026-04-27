@@ -1,4 +1,4 @@
-# `@cloudspe/livepeer-gateway-core`
+# `@cloudspe/livepeer-openai-gateway-core`
 
 OpenAI-compatible request engine fronting Livepeer worker pools.
 Adapter-driven: bring your own billing, auth, rate-limit, logging,
@@ -7,7 +7,7 @@ read-only operator dashboard.
 
 ```
 ┌─────────────────────────┐    ┌──────────────────────────────────────┐    ┌──────────────┐
-│ OpenAI client (curl /   │ →  │  livepeer-gateway-core (this engine) │ →  │ WorkerNodes  │
+│ OpenAI client (curl /   │ →  │  livepeer-openai-gateway-core (this engine) │ →  │ WorkerNodes  │
 │ openai-sdk / langchain) │    │  ─ auth → rate-limit → reserve →     │    │ (paid via    │
 └─────────────────────────┘    │    select node → call → commit       │    │  payment-    │
                                │  ─ Fastify routes wire in            │    │  daemon)     │
@@ -24,8 +24,8 @@ example. It uses `InMemoryWallet` + a no-op AuthResolver so there's
 no DB or identity provider to wire up.
 
 ```sh
-git clone https://github.com/Cloud-SPE/livepeer-gateway-core.git
-cd livepeer-gateway-core
+git clone https://github.com/Cloud-SPE/livepeer-openai-gateway-core.git
+cd livepeer-openai-gateway-core
 npm install
 cd examples/minimal-shell
 cp service-registry-config.example.yaml service-registry-config.yaml
@@ -92,7 +92,7 @@ Cross-ecosystem metric naming + port allocation conventions live at
 ## Reference shell implementation
 
 [`Cloud-SPE/livepeer-openai-gateway`](https://github.com/Cloud-SPE/livepeer-openai-gateway)
-is a production-ready shell that wires `@cloudspe/livepeer-gateway-core`
+is a production-ready shell that wires `@cloudspe/livepeer-openai-gateway-core`
 with prepaid USD billing (Postgres + Stripe top-ups), API-key auth,
 Redis-backed rate limiting, and admin + customer-portal SPAs. Read
 it as a worked example of how the adapter contracts compose under

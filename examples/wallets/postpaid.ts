@@ -11,7 +11,7 @@ import type {
   ReservationHandle,
   UsageReport,
   Wallet,
-} from '@cloudspe/livepeer-gateway-core/interfaces/index.js';
+} from '@cloudspe/livepeer-openai-gateway-core/interfaces/index.js';
 
 interface PostpaidStore {
   recordUsage(input: {

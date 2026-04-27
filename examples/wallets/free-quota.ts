@@ -9,13 +9,13 @@
 //
 // See docs/adapters.md → "Pattern: free-quota tokens" for the framing.
 
-import { QuotaExceededError } from '@cloudspe/livepeer-gateway-core/service/billing/errors.js';
+import { QuotaExceededError } from '@cloudspe/livepeer-openai-gateway-core/service/billing/errors.js';
 import type {
   CostQuote,
   ReservationHandle,
   UsageReport,
   Wallet,
-} from '@cloudspe/livepeer-gateway-core/interfaces/index.js';
+} from '@cloudspe/livepeer-openai-gateway-core/interfaces/index.js';
 
 interface QuotaReservation {
   id: string;

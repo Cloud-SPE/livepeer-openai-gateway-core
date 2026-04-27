@@ -1,6 +1,6 @@
 # Adapters
 
-`@cloudspe/livepeer-gateway-core` is built around **five
+`@cloudspe/livepeer-openai-gateway-core` is built around **five
 operator-overridable adapters**. The engine commits to a tight
 contract for each; everything else is internal and may change without
 warning.
@@ -62,7 +62,7 @@ import type {
   CostQuote,
   UsageReport,
   ReservationHandle,
-} from '@cloudspe/livepeer-gateway-core/interfaces/index.js';
+} from '@cloudspe/livepeer-openai-gateway-core/interfaces/index.js';
 
 interface Wallet {
   reserve(callerId: string, quote: CostQuote): Promise<ReservationHandle | null>;
@@ -373,7 +373,7 @@ this interface — see `pino` integration example below.
 
 ```ts
 import pino from 'pino';
-import type { Logger } from '@cloudspe/livepeer-gateway-core/interfaces/index.js';
+import type { Logger } from '@cloudspe/livepeer-openai-gateway-core/interfaces/index.js';
 
 const pinoInstance = pino({ level: 'info' });
 
@@ -420,7 +420,7 @@ The engine commits to the
 as the canonical source of WorkerNode discovery + selection.
 
 The interface lives in the public package surface
-(`@cloudspe/livepeer-gateway-core/providers/serviceRegistry.js`)
+(`@cloudspe/livepeer-openai-gateway-core/providers/serviceRegistry.js`)
 for two reasons:
 
 - **Testability** — tests need to stub the registry to avoid

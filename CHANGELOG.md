@@ -14,7 +14,7 @@ post-1.0.
 
 - Initial extraction from the `openai-livepeer-bridge` monorepo (now
   `livepeer-openai-gateway`). The engine ships as
-  `@cloudspe/livepeer-gateway-core`.
+  `@cloudspe/livepeer-openai-gateway-core`.
 - Adapter interfaces (operator-overridable):
   - `Wallet` (reserve / commit / refund; multi-unit cost via cents +
     wei + estimatedTokens).
@@ -28,18 +28,18 @@ post-1.0.
 - Provider interface (engine-internal, not operator-overridable):
   - `ServiceRegistryClient` — gRPC client for
     [`livepeer-modules-project/service-registry-daemon`](https://github.com/livepeer-modules-project/service-registry-daemon).
-- Framework-free dispatchers under `@cloudspe/livepeer-gateway-core/dispatch/`:
+- Framework-free dispatchers under `@cloudspe/livepeer-openai-gateway-core/dispatch/`:
   chat completions (streaming + non-streaming), embeddings, image
   generations, audio speech, audio transcriptions.
-- Fastify adapter at `@cloudspe/livepeer-gateway-core/runtime/http/*`
+- Fastify adapter at `@cloudspe/livepeer-openai-gateway-core/runtime/http/*`
   registering OpenAI-compatible routes (`/v1/chat/completions`, etc.),
   the auth + rate-limit middleware, the metrics hook, and the
   HTTP-error mapping layer.
 - Optional read-only operator dashboard at
-  `@cloudspe/livepeer-gateway-core/dashboard` — vanilla server-rendered
+  `@cloudspe/livepeer-openai-gateway-core/dashboard` — vanilla server-rendered
   HTML, no client framework or build step.
 - `InMemoryWallet` reference implementation for testing
-  (`@cloudspe/livepeer-gateway-core/service/billing/inMemoryWallet.js`).
+  (`@cloudspe/livepeer-openai-gateway-core/service/billing/inMemoryWallet.js`).
 - Hand-rolled migration runner with a `public.bridge_schema_migrations`
   tracker; engine schema in `migrations/0000_engine_init.sql`
   (`engine.node_health`, `engine.node_health_events`,
@@ -56,5 +56,5 @@ post-1.0.
 - `examples/minimal-shell/` — runnable example using `InMemoryWallet`
   + a no-op AuthResolver so adopters can clone-and-run in 30 seconds.
 
-[Unreleased]: https://github.com/Cloud-SPE/livepeer-gateway-core/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/Cloud-SPE/livepeer-gateway-core/releases/tag/v0.1.0
+[Unreleased]: https://github.com/Cloud-SPE/livepeer-openai-gateway-core/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/Cloud-SPE/livepeer-openai-gateway-core/releases/tag/v0.1.0

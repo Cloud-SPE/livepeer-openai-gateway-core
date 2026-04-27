@@ -1,4 +1,4 @@
-# DESIGN — `@cloudspe/livepeer-gateway-core`
+# DESIGN — `@cloudspe/livepeer-openai-gateway-core`
 
 ## What this is
 
@@ -83,7 +83,7 @@ as the canonical discovery source. Operators with proprietary
 discovery systems should run a daemon shim instead of swapping
 the engine's gRPC client.
 
-The interface is exported (`@cloudspe/livepeer-gateway-core/providers/serviceRegistry.js`)
+The interface is exported (`@cloudspe/livepeer-openai-gateway-core/providers/serviceRegistry.js`)
 for two reasons: testability (stub for unit tests; see
 `createFakeServiceRegistry`) and transparency (see what calls the
 daemon makes). It is not on the operator-overridable list.

@@ -8,13 +8,13 @@
 //
 // See docs/adapters.md → "Pattern: prepaid USD" for the framing.
 
-import { BalanceInsufficientError } from '@cloudspe/livepeer-gateway-core/service/billing/errors.js';
+import { BalanceInsufficientError } from '@cloudspe/livepeer-openai-gateway-core/service/billing/errors.js';
 import type {
   CostQuote,
   ReservationHandle,
   UsageReport,
   Wallet,
-} from '@cloudspe/livepeer-gateway-core/interfaces/index.js';
+} from '@cloudspe/livepeer-openai-gateway-core/interfaces/index.js';
 
 interface Reservation {
   id: string;

@@ -37,7 +37,7 @@ The maintainers decide on:
 - The engine database schema (the `engine.*` namespace).
 - The engine metric surface (the `livepeer_bridge_*` prefix).
 - The Fastify adapter's exported route registers.
-- Public API exports under `@cloudspe/livepeer-gateway-core/*`.
+- Public API exports under `@cloudspe/livepeer-openai-gateway-core/*`.
 
 Operators are expected to make their own choices about:
 
@@ -81,7 +81,7 @@ loses all roles immediately, with notice to the community.
 
 The MIT license permits forks for any reason. We ask (don't require)
 that forks rename to avoid confusion with upstream releases — e.g. if
-you maintain a private fork of `@cloudspe/livepeer-gateway-core`,
+you maintain a private fork of `@cloudspe/livepeer-openai-gateway-core`,
 publish it under your own scope.
 
 If you maintain an active public fork that diverges from upstream,

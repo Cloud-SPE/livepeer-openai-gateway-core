@@ -19,7 +19,7 @@
 - [ ] No change to public adapter interfaces (`Wallet`, `AuthResolver`,
       `RateLimiter`, `Logger`, `AdminAuthResolver`)
 - [ ] Schema unchanged (no migration required)
-- [ ] Public export paths unchanged (`@cloudspe/livepeer-gateway-core/*`)
+- [ ] Public export paths unchanged (`@cloudspe/livepeer-openai-gateway-core/*`)
 
 If any of the above are checked off because the PR *does* change them,
 flag the version-bump intent below.

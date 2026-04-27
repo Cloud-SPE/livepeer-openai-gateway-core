@@ -1,4 +1,4 @@
-# AGENTS.md — `@cloudspe/livepeer-gateway-core`
+# AGENTS.md — `@cloudspe/livepeer-openai-gateway-core`
 
 This is the engine half of an OpenAI-compatible gateway over Livepeer
 worker pools. It is **agent-first**: the contributor process leans on
@@ -155,7 +155,7 @@ Same ladder applies to:
 - The Drizzle schema (`src/repo/schema.ts`).
 - The metric prefix or build-info gauge shape
   (`src/providers/metrics/recorder.ts`).
-- Public exports under `@cloudspe/livepeer-gateway-core/*`.
+- Public exports under `@cloudspe/livepeer-openai-gateway-core/*`.
 - The `ServiceRegistryClient` engine-internal contract.
 
 ## See also

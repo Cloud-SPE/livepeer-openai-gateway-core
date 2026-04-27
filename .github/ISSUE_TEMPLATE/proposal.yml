@@ -27,7 +27,7 @@ body:
       options:
         - label: This is a breaking change to a public adapter interface (Wallet, AuthResolver, RateLimiter, Logger, AdminAuthResolver)
         - label: This requires a database schema migration
-        - label: This adds or changes a public export path under `@cloudspe/livepeer-gateway-core/*`
+        - label: This adds or changes a public export path under `@cloudspe/livepeer-openai-gateway-core/*`
         - label: This changes the engine metric surface (`livepeer_bridge_*` prefix)
         - label: This changes the `ServiceRegistryClient` engine-internal contract
   - type: markdown
