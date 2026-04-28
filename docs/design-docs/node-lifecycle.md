@@ -1,14 +1,28 @@
 ---
-title: Node lifecycle (NodeBook, QuoteRefresher, health + circuit breaker)
+title: Node lifecycle (registry-daemon, QuoteRefresher, health + circuit breaker)
 status: accepted
-last-reviewed: 2026-04-25
+last-reviewed: 2026-04-28
 ---
 
 # Node lifecycle
 
-How WorkerNodes enter, run in, and leave the bridge's routing pool.
+How WorkerNodes enter, run in, and leave the engine's routing pool.
 
-## Source of truth: `nodes.yaml`
+## Status — post-engine-extraction
+
+> **2026-04-28:** the engine no longer reads a local `nodes.yaml`. Node
+> discovery is now an engine-internal `ServiceRegistryClient` provider
+> (gRPC against `livepeer-modules-project/service-registry-daemon`) that
+> the operator wires at the composition root. See
+> `src/providers/serviceRegistry.ts` + `examples/minimal-shell/start.ts`.
+> The daemon's static-overlay YAML (`registry.example.yaml` in the
+> daemon repo) is the operator-curated source of truth; the engine
+> enumerates it once at startup into a start-time-static `nodeIndex`.
+> The historical pre-extraction section preserved below describes the
+> bridge-side `nodes.yaml` contract; useful reference but not how the
+> engine works today.
+
+## (Historical) Source of truth: `nodes.yaml`
 
 Config-driven allowlist. The file path is passed to the bridge process; SIGHUP triggers a safe reload. Shape (Appendix B of `docs/references/openai-bridge-architecture.md`, extended with per-node knobs):
 
