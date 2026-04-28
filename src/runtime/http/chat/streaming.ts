@@ -1,6 +1,6 @@
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import type { Db } from '../../../repo/db.js';
-import type { PricingConfig } from '../../../config/pricing.js';
+import type { PricingConfigProvider } from '../../../config/pricing.js';
 import type { NodeClient } from '../../../providers/nodeClient.js';
 import type { PaymentsService } from '../../../service/payments/createPayment.js';
 import type { ServiceRegistryClient } from '../../../providers/serviceRegistry.js';
@@ -20,7 +20,7 @@ export interface StreamingDeps {
   quoteCache: QuoteCache;
   nodeClient: NodeClient;
   paymentsService: PaymentsService;
-  pricing: PricingConfig;
+  pricing: PricingConfigProvider;
   wallet: Wallet;
   tokenAudit?: TokenAuditService;
   recorder?: Recorder;

@@ -47,7 +47,14 @@ import { loadDatabaseConfig } from '@cloudspe/livepeer-openai-gateway-core/confi
 import { loadRedisConfig } from '@cloudspe/livepeer-openai-gateway-core/config/redis.js';
 import { loadPayerDaemonConfig } from '@cloudspe/livepeer-openai-gateway-core/config/payerDaemon.js';
 import { loadServiceRegistryConfig } from '@cloudspe/livepeer-openai-gateway-core/config/serviceRegistry.js';
-import { loadPricingConfig } from '@cloudspe/livepeer-openai-gateway-core/config/pricing.js';
+import {
+  createPricingConfigProvider,
+  loadPricingEnvConfig,
+} from '@cloudspe/livepeer-openai-gateway-core/config/pricing.js';
+// In a real deployment, the operator wires a DB-backed RateCardResolver
+// (see livepeer-openai-gateway shell). For the minimal example we use a
+// static in-memory snapshot from the engine's test fixtures.
+import { TEST_RATE_CARD_SNAPSHOT } from '@cloudspe/livepeer-openai-gateway-core/service/pricing/testFixtures.js';
 import { loadRoutingConfig } from '@cloudspe/livepeer-openai-gateway-core/config/routing.js';
 import { defaultRateLimitConfig } from '@cloudspe/livepeer-openai-gateway-core/config/rateLimit.js';
 import { knownEncodings } from '@cloudspe/livepeer-openai-gateway-core/config/tokenizer.js';
@@ -170,7 +177,13 @@ async function main(): Promise<void> {
   // Payments service.
   const sessionCache = createSessionCache({ payerDaemon });
   const paymentsService = createPaymentsService({ payerDaemon, sessions: sessionCache });
-  const pricing = loadPricingConfig();
+  // Static rate-card snapshot — fine for a smoke. Replace with a
+  // DB-backed RateCardResolver in production.
+  const pricingEnv = loadPricingEnvConfig();
+  const pricing = createPricingConfigProvider(
+    { current: () => TEST_RATE_CARD_SNAPSHOT },
+    pricingEnv,
+  );
 
   // HTTP.
   const app = Fastify({ logger: true });

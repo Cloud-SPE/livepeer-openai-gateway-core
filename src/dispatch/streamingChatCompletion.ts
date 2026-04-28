@@ -1,8 +1,8 @@
 import { randomUUID } from 'node:crypto';
 import type { Db } from '../repo/db.js';
 import * as usageRecordsRepo from '../repo/usageRecords.js';
-import type { PricingConfig } from '../config/pricing.js';
-import { rateForTier } from '../config/pricing.js';
+import type { PricingConfigProvider } from '../config/pricing.js';
+import { rateForTier } from '../service/pricing/rateCardLookup.js';
 import type { NodeClient } from '../providers/nodeClient.js';
 import type { PaymentsService } from '../service/payments/createPayment.js';
 import type { ServiceRegistryClient } from '../providers/serviceRegistry.js';
@@ -43,7 +43,7 @@ export interface StreamingChatCompletionDispatchDeps {
   quoteCache: QuoteCache;
   nodeClient: NodeClient;
   paymentsService: PaymentsService;
-  pricing: PricingConfig;
+  pricing: PricingConfigProvider;
   tokenAudit?: TokenAuditService;
   recorder?: Recorder;
   nodeCallTimeoutMs?: number;
@@ -275,7 +275,7 @@ interface SettleInput {
   nodeUrl: string;
   nodeId: string;
   model: string;
-  pricing: PricingConfig;
+  pricing: PricingConfigProvider;
   estimate: ReturnType<typeof estimateReservation>;
   capturedUsage: Usage | null;
   firstTokenDelivered: boolean;
@@ -363,7 +363,7 @@ async function settleReservation(input: SettleInput): Promise<{
   // Tokens delivered but no usage chunk: partial commit using local
   // tokenizer when available, prompt-estimate fallback otherwise.
   const pricingTier = input.estimate.pricingTier;
-  const rate = rateForTier(input.pricing.rateCard, pricingTier);
+  const rate = rateForTier(input.pricing.current().rateCard, pricingTier);
   const localPrompt = input.tokenAudit?.countPromptTokens(input.model, input.messages) ?? null;
   const completionTokens = input.localCompletionTokens ?? 0;
   const promptTokens = localPrompt ?? input.estimate.promptEstimateTokens;

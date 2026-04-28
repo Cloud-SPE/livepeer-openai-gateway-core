@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { defaultPricingConfig } from '../../config/pricing.js';
+import { testPricingConfig, testPricingProvider, staticProvider } from './testFixtures.js';
 import {
   computeActualCost,
   computeEmbeddingsActualCost,
@@ -11,16 +11,17 @@ import {
 } from './index.js';
 import { ModelNotFoundError } from '../routing/errors.js';
 
-const cfg = defaultPricingConfig();
+const cfg = testPricingConfig();
+const provider = testPricingProvider();
 
 describe('resolveTierForModel', () => {
   it('returns the tier for a known model', () => {
-    expect(resolveTierForModel(cfg, 'model-small')).toBe('starter');
-    expect(resolveTierForModel(cfg, 'model-large')).toBe('pro');
+    expect(resolveTierForModel(provider, 'model-small')).toBe('starter');
+    expect(resolveTierForModel(provider, 'model-large')).toBe('pro');
   });
 
   it('throws ModelNotFoundError for unknown models', () => {
-    expect(() => resolveTierForModel(cfg, 'nonexistent')).toThrow(ModelNotFoundError);
+    expect(() => resolveTierForModel(provider, 'nonexistent')).toThrow(ModelNotFoundError);
   });
 });
 
@@ -33,7 +34,7 @@ describe('estimateReservation', () => {
         max_tokens: 1000,
       },
       'prepaid',
-      cfg,
+      provider,
     );
     expect(est.pricingTier).toBe('starter');
     expect(est.promptEstimateTokens).toBe(10);
@@ -47,14 +48,14 @@ describe('estimateReservation', () => {
     const free = estimateReservation(
       { model: 'model-small', messages: [{ role: 'user', content: 'hi' }] },
       'free',
-      cfg,
+      provider,
     );
     expect(free.maxCompletionTokens).toBe(cfg.defaultMaxTokensFree);
 
     const prepaid = estimateReservation(
       { model: 'model-small', messages: [{ role: 'user', content: 'hi' }] },
       'prepaid',
-      cfg,
+      provider,
     );
     expect(prepaid.maxCompletionTokens).toBe(cfg.defaultMaxTokensPrepaid);
   });
@@ -64,7 +65,7 @@ describe('estimateReservation', () => {
       estimateReservation(
         { model: 'missing', messages: [{ role: 'user', content: 'hi' }] },
         'prepaid',
-        cfg,
+        provider,
       ),
     ).toThrow(ModelNotFoundError);
   });
@@ -80,7 +81,7 @@ describe('computeActualCost', () => {
       { prompt_tokens: 100, completion_tokens: 200, total_tokens: 300 },
       'prepaid',
       'model-large',
-      cfg,
+      provider,
     );
     expect(c.actualCents).toBe(1n);
     expect(c.pricingTier).toBe('pro');
@@ -93,7 +94,7 @@ describe('computeActualCost', () => {
       { prompt_tokens: 1_000_000, completion_tokens: 1_000_000, total_tokens: 2_000_000 },
       'prepaid',
       'model-medium',
-      cfg,
+      provider,
     );
     expect(c.actualCents).toBe(55n);
   });
@@ -105,7 +106,7 @@ describe('estimateEmbeddingsReservation', () => {
     const est = estimateEmbeddingsReservation(
       ['x'.repeat(30)],
       'text-embedding-3-small',
-      cfg,
+      provider,
     );
     expect(est.promptEstimateTokens).toBe(10);
     expect(est.estCents).toBe(0n);
@@ -116,7 +117,7 @@ describe('estimateEmbeddingsReservation', () => {
     const est = estimateEmbeddingsReservation(
       ['x'.repeat(300_000)],
       'text-embedding-3-small',
-      cfg,
+      provider,
     );
     expect(est.promptEstimateTokens).toBe(100_000);
     expect(est.estCents).toBe(1n);
@@ -126,14 +127,14 @@ describe('estimateEmbeddingsReservation', () => {
     const est = estimateEmbeddingsReservation(
       ['x'.repeat(30), 'y'.repeat(60)],
       'text-embedding-3-large',
-      cfg,
+      provider,
     );
     expect(est.promptEstimateTokens).toBe(30);
   });
 
   it('throws for unknown embeddings model', () => {
     expect(() =>
-      estimateEmbeddingsReservation(['hi'], 'nonexistent-emb-model', cfg),
+      estimateEmbeddingsReservation(['hi'], 'nonexistent-emb-model', provider),
     ).toThrow();
   });
 });
@@ -141,7 +142,7 @@ describe('estimateEmbeddingsReservation', () => {
 describe('computeEmbeddingsActualCost', () => {
   it('charges input tokens only at the model rate', () => {
     // 1_000_000 tokens × $0.05/1M (v2) = $0.05 = 5¢
-    const c = computeEmbeddingsActualCost(1_000_000, 'text-embedding-3-large', cfg);
+    const c = computeEmbeddingsActualCost(1_000_000, 'text-embedding-3-large', provider);
     expect(c.actualCents).toBe(5n);
   });
 });
@@ -154,17 +155,17 @@ describe('estimateImagesReservation', () => {
     // Per-image cents from the actual computePerImageCents pipeline:
     // micro = round(0.025 × 100 × 10000) = 25_000; (25000 + 9999) / 10000 = 3.
     // So perImageCents = 3, estCents = 3 × 3 = 9.
-    const est = estimateImagesReservation(3, 'dall-e-3', '1024x1024', 'standard', cfg);
+    const est = estimateImagesReservation(3, 'dall-e-3', '1024x1024', 'standard', provider);
     expect(est.perImageCents).toBe(3n);
     expect(est.estCents).toBe(9n);
   });
 
   it('throws for unknown (model, size, quality) combination', () => {
     expect(() =>
-      estimateImagesReservation(1, 'dall-e-3', '1024x1024', 'hd', cfg),
+      estimateImagesReservation(1, 'dall-e-3', '1024x1024', 'hd', provider),
     ).not.toThrow();
     expect(() =>
-      estimateImagesReservation(1, 'nonexistent', '1024x1024', 'standard', cfg),
+      estimateImagesReservation(1, 'nonexistent', '1024x1024', 'standard', provider),
     ).toThrow();
   });
 });
@@ -172,7 +173,7 @@ describe('estimateImagesReservation', () => {
 describe('computeImagesActualCost', () => {
   it('bills at returned count × per-image rate', () => {
     // 2 images × $0.05 = $0.10 = 10¢ (hd, v2)
-    const c = computeImagesActualCost(2, 'dall-e-3', '1024x1024', 'hd', cfg);
+    const c = computeImagesActualCost(2, 'dall-e-3', '1024x1024', 'hd', provider);
     expect(c.actualCents).toBe(10n);
     expect(c.perImageCents).toBe(5n);
   });

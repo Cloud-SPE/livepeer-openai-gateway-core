@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import type { Db } from '../repo/db.js';
 import * as usageRecordsRepo from '../repo/usageRecords.js';
-import type { PricingConfig } from '../config/pricing.js';
+import type { PricingConfigProvider } from '../config/pricing.js';
 import type { NodeClient } from '../providers/nodeClient.js';
 import type { PaymentsService } from '../service/payments/createPayment.js';
 import type { ServiceRegistryClient } from '../providers/serviceRegistry.js';
@@ -36,7 +36,7 @@ export interface SpeechDispatchDeps {
   quoteCache: QuoteCache;
   nodeClient: NodeClient;
   paymentsService: PaymentsService;
-  pricing: PricingConfig;
+  pricing: PricingConfigProvider;
   recorder?: Recorder;
   nodeCallTimeoutMs?: number;
   rng?: () => number;

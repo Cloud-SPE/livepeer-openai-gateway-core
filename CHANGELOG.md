@@ -8,6 +8,75 @@ post-1.0.
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-04-28
+
+### BREAKING
+
+- **`V1_RATE_CARD` / `V1_MODEL_TO_TIER` removed.** The hardcoded rate
+  cards and model→tier map that shipped in 0.1.x are gone. Consumers
+  must inject a `RateCardResolver` adapter (parallel to `Wallet`,
+  `AuthResolver`). See `src/interfaces/rateCardResolver.ts`.
+- **Dispatcher `pricing` deps changed shape.** Every dispatcher and
+  route-registration deps that previously took `pricing: PricingConfig`
+  now takes `pricing: PricingConfigProvider` (`{ current(): PricingConfig }`).
+  Wrap a static config with `{ current: () => config }` for
+  same-as-before behavior; the provider shape lets shells swap in
+  live-refreshing snapshots without restart.
+- **`defaultPricingConfig()` / `loadPricingConfig()` removed.** Replaced
+  by `loadPricingEnvConfig()` (non-rate-card env knobs only) +
+  `createPricingConfig(snapshot, env)` builder. Operators combine a
+  `RateCardSnapshot` from their resolver with env config to build a
+  `PricingConfig`.
+
+### Added
+
+- `RateCardResolver` interface and `RateCardSnapshot` type covering
+  all 5 capability rate cards plus pattern overlays per category.
+- Pattern-aware lookup helpers (`resolveChatTier`, `resolveEmbeddingsRate`,
+  `resolveImagesRate`, `resolveSpeechRate`, `resolveTranscriptionsRate`)
+  in `service/pricing/rateCardLookup.ts`. Resolution order is
+  exact-match → patterns by `sortOrder` ascending → null.
+- Glob matcher (`service/pricing/glob.ts`) — `*` and `?` wildcards,
+  no regex. Compiled patterns cached process-lifetime.
+- `createPricingConfigProvider(resolver, env)` helper — composes a
+  resolver + env config into a `PricingConfigProvider`.
+- `service/pricing/testFixtures.ts` — engine test fixtures (the v2
+  rate card data that was previously hardcoded). Shell consumers ship
+  their own seed migration; engine ships these only as test fixtures.
+
+### Changed
+
+- All pricing-service helpers (`estimateReservation`,
+  `computeActualCost`, `estimateEmbeddingsReservation`, etc.) now take
+  `provider: PricingConfigProvider` instead of `config: PricingConfig`.
+  Inside each helper the snapshot is fetched via `provider.current()`.
+
+### Migration guide
+
+Pre-0.2.0 shells:
+```ts
+import { loadPricingConfig } from '@cloudspe/livepeer-openai-gateway-core/config/pricing.js';
+const pricing = loadPricingConfig();
+registerChatCompletionsRoute(app, { ..., pricing });
+```
+
+0.2.0:
+```ts
+import {
+  createPricingConfigProvider,
+  loadPricingEnvConfig,
+} from '@cloudspe/livepeer-openai-gateway-core/config/pricing.js';
+
+// Operator-supplied resolver — DB-backed, file-backed, or in-memory.
+const resolver: RateCardResolver = createMyRateCardResolver({ db });
+
+const pricing = createPricingConfigProvider(resolver, loadPricingEnvConfig());
+registerChatCompletionsRoute(app, { ..., pricing });
+```
+
+For tests / quick smoke deployments the engine ships
+`TEST_RATE_CARD_SNAPSHOT` in `service/pricing/testFixtures.js`.
+
 ## [0.1.0] - 2026-04-27
 
 ### Added
