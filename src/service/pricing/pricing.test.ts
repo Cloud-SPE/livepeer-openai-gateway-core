@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { testPricingConfig, testPricingProvider, staticProvider } from './testFixtures.js';
+import { testPricingConfig, testPricingProvider } from './testFixtures.js';
 import {
   computeActualCost,
   computeEmbeddingsActualCost,
