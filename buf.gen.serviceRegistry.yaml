@@ -10,4 +10,4 @@ plugins:
       - forceLong=bigint
       - env=node
 inputs:
-  - directory: ../livepeer-modules-project/service-registry-daemon/proto
+  - directory: ../livepeer-modules/service-registry-daemon/proto

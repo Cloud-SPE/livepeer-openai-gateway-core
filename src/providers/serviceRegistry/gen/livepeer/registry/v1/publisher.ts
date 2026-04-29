@@ -36,6 +36,21 @@ export interface BuildResult {
   canonicalSha256: string;
 }
 
+/**
+ * BuildAndSignRequest is the operator-facing one-shot path: the daemon
+ * builds the canonical manifest from `nodes` and signs it with the
+ * loaded keystore in a single round-trip. Driven from the secure orch
+ * by the livepeer-registry-refresh CLI when capacity changes.
+ *
+ * HTTP probe-from-URL discovery is a follow-up — for v1, callers
+ * supply fully-formed Nodes (operator hand-curates or uses their own
+ * inventory tooling). See tech-debt: publisher-http-probe-impl.
+ */
+export interface BuildAndSignRequest {
+  nodes: Node[];
+  expiresAt?: Date | undefined;
+}
+
 export interface SignManifestRequest {
   manifestJson: Buffer;
 }
@@ -243,6 +258,86 @@ export const BuildResult: MessageFns<BuildResult> = {
     message.manifestJson = object.manifestJson ?? Buffer.alloc(0);
     message.canonicalBytes = object.canonicalBytes ?? Buffer.alloc(0);
     message.canonicalSha256 = object.canonicalSha256 ?? "";
+    return message;
+  },
+};
+
+function createBaseBuildAndSignRequest(): BuildAndSignRequest {
+  return { nodes: [], expiresAt: undefined };
+}
+
+export const BuildAndSignRequest: MessageFns<BuildAndSignRequest> = {
+  encode(message: BuildAndSignRequest, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+    for (const v of message.nodes) {
+      Node.encode(v!, writer.uint32(10).fork()).join();
+    }
+    if (message.expiresAt !== undefined) {
+      Timestamp.encode(toTimestamp(message.expiresAt), writer.uint32(18).fork()).join();
+    }
+    return writer;
+  },
+
+  decode(input: BinaryReader | Uint8Array, length?: number): BuildAndSignRequest {
+    const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
+    const end = length === undefined ? reader.len : reader.pos + length;
+    const message = createBaseBuildAndSignRequest();
+    while (reader.pos < end) {
+      const tag = reader.uint32();
+      switch (tag >>> 3) {
+        case 1: {
+          if (tag !== 10) {
+            break;
+          }
+
+          message.nodes.push(Node.decode(reader, reader.uint32()));
+          continue;
+        }
+        case 2: {
+          if (tag !== 18) {
+            break;
+          }
+
+          message.expiresAt = fromTimestamp(Timestamp.decode(reader, reader.uint32()));
+          continue;
+        }
+      }
+      if ((tag & 7) === 4 || tag === 0) {
+        break;
+      }
+      reader.skip(tag & 7);
+    }
+    return message;
+  },
+
+  fromJSON(object: any): BuildAndSignRequest {
+    return {
+      nodes: globalThis.Array.isArray(object?.nodes) ? object.nodes.map((e: any) => Node.fromJSON(e)) : [],
+      expiresAt: isSet(object.expiresAt)
+        ? fromJsonTimestamp(object.expiresAt)
+        : isSet(object.expires_at)
+        ? fromJsonTimestamp(object.expires_at)
+        : undefined,
+    };
+  },
+
+  toJSON(message: BuildAndSignRequest): unknown {
+    const obj: any = {};
+    if (message.nodes?.length) {
+      obj.nodes = message.nodes.map((e) => Node.toJSON(e));
+    }
+    if (message.expiresAt !== undefined) {
+      obj.expiresAt = message.expiresAt.toISOString();
+    }
+    return obj;
+  },
+
+  create<I extends Exact<DeepPartial<BuildAndSignRequest>, I>>(base?: I): BuildAndSignRequest {
+    return BuildAndSignRequest.fromPartial(base ?? ({} as any));
+  },
+  fromPartial<I extends Exact<DeepPartial<BuildAndSignRequest>, I>>(object: I): BuildAndSignRequest {
+    const message = createBaseBuildAndSignRequest();
+    message.nodes = object.nodes?.map((e) => Node.fromPartial(e)) || [];
+    message.expiresAt = object.expiresAt ?? undefined;
     return message;
   },
 };
@@ -681,6 +776,15 @@ export const PublisherService = {
     responseSerialize: (value: SignedManifest): Buffer => Buffer.from(SignedManifest.encode(value).finish()),
     responseDeserialize: (value: Buffer): SignedManifest => SignedManifest.decode(value),
   },
+  buildAndSign: {
+    path: "/livepeer.registry.v1.Publisher/BuildAndSign" as const,
+    requestStream: false as const,
+    responseStream: false as const,
+    requestSerialize: (value: BuildAndSignRequest): Buffer => Buffer.from(BuildAndSignRequest.encode(value).finish()),
+    requestDeserialize: (value: Buffer): BuildAndSignRequest => BuildAndSignRequest.decode(value),
+    responseSerialize: (value: SignedManifest): Buffer => Buffer.from(SignedManifest.encode(value).finish()),
+    responseDeserialize: (value: Buffer): SignedManifest => SignedManifest.decode(value),
+  },
   writeServiceUri: {
     path: "/livepeer.registry.v1.Publisher/WriteServiceURI" as const,
     requestStream: false as const,
@@ -714,6 +818,7 @@ export const PublisherService = {
 export interface PublisherServer extends UntypedServiceImplementation {
   buildManifest: handleUnaryCall<BuildManifestRequest, BuildResult>;
   signManifest: handleUnaryCall<SignManifestRequest, SignedManifest>;
+  buildAndSign: handleUnaryCall<BuildAndSignRequest, SignedManifest>;
   writeServiceUri: handleUnaryCall<WriteServiceURIRequest, TxHashResult>;
   probeWorker: handleUnaryCall<ProbeWorkerRequest, ProbeResult>;
   health: handleUnaryCall<Empty, HealthResult>;
@@ -746,6 +851,21 @@ export interface PublisherClient extends Client {
   ): ClientUnaryCall;
   signManifest(
     request: SignManifestRequest,
+    metadata: Metadata,
+    options: Partial<CallOptions>,
+    callback: (error: ServiceError | null, response: SignedManifest) => void,
+  ): ClientUnaryCall;
+  buildAndSign(
+    request: BuildAndSignRequest,
+    callback: (error: ServiceError | null, response: SignedManifest) => void,
+  ): ClientUnaryCall;
+  buildAndSign(
+    request: BuildAndSignRequest,
+    metadata: Metadata,
+    callback: (error: ServiceError | null, response: SignedManifest) => void,
+  ): ClientUnaryCall;
+  buildAndSign(
+    request: BuildAndSignRequest,
     metadata: Metadata,
     options: Partial<CallOptions>,
     callback: (error: ServiceError | null, response: SignedManifest) => void,

@@ -137,7 +137,7 @@ export function createGrpcServiceRegistryClient(
     async select(query: SelectQuery): Promise<NodeRef[]> {
       const result = await selectInternal({
         capability: capabilityString(query.capability),
-        model: query.model ?? '',
+        offering: query.model ?? '',
         tier: query.tier ?? '',
         minWeight: 0,
         geoLat: 0,
