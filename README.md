@@ -98,14 +98,9 @@ load.
 
 ## Versioning
 
-**Pre-1.0 (`0.x`)**: breaking changes may land in any minor release.
-Every breaking change is documented in [`CHANGELOG.md`](CHANGELOG.md).
-Pin to a `^0.1.0`-style range and bump explicitly — don't
-auto-update.
-
-**Post-1.0**: strict [SemVer](https://semver.org/). 1.0 ships when
-the first external operator successfully runs in production on this
-engine and signs off on the adapter contracts.
+**Versioning**: this package now ships on the shared suite semver line.
+Use standard [SemVer](https://semver.org/) expectations for `4.x`
+releases and pin/update according to your shell's compatibility policy.
 
 ## Documentation map
 
