@@ -1,10 +1,9 @@
-# payment-daemon sender-mode config — minimal-shell example.
-# Copy to payment-daemon-config.yaml in this directory and edit.
+# payment-daemon sender-mode config — reference only for minimal-shell.
 #
 # Most operators pass these as CLI flags via compose.yaml's command
 # section instead of a config file. The compose.yaml in this directory
-# uses CLI flags (CHAIN_RPC env var); this file is here as a reference
-# for operators who prefer file-based config.
+# uses CLI flags directly; this file remains here only as a reference
+# for operators who prefer file-based config in a custom fork.
 #
 # Hot/cold split: --orch-address overrides the keystore-derived
 # address with a different orchestrator identity. Useful when the

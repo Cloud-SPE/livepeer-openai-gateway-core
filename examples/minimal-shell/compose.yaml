@@ -7,7 +7,6 @@
 #
 # Operator must populate:
 #   - service-registry-config.yaml (worker pool list)
-#   - payment-daemon-config.yaml   (keystore + RPC)
 #   - keystore.json + keystore-password
 #
 # Usage: docker compose up
@@ -37,7 +36,7 @@ services:
       retries: 20
 
   service-registry-daemon:
-    image: ${SERVICE_REGISTRY_IMAGE:-ghcr.io/livepeer-modules-project/service-registry-daemon:dev}
+    image: ${SERVICE_REGISTRY_IMAGE:-tztcloud/livepeer-service-registry-daemon:v4.0.1}
     command:
       - --mode=resolver
       - --socket=/var/run/livepeer/service-registry.sock
@@ -47,7 +46,7 @@ services:
       - daemon-sockets:/var/run/livepeer
 
   payment-daemon:
-    image: ${PAYMENT_DAEMON_IMAGE:-tztcloud/livepeer-payment-daemon:v0.8.10}
+    image: ${PAYMENT_DAEMON_IMAGE:-tztcloud/livepeer-payment-daemon:v4.0.1}
     command:
       - --mode=sender
       - --socket=/var/run/livepeer/payment.sock

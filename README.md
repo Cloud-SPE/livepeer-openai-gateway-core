@@ -29,9 +29,7 @@ cd livepeer-openai-gateway-core
 npm install
 cd examples/minimal-shell
 cp service-registry-config.example.yaml service-registry-config.yaml
-cp payment-daemon-config.example.yaml payment-daemon-config.yaml
 $EDITOR service-registry-config.yaml          # add your worker nodes
-$EDITOR payment-daemon-config.yaml            # add your keystore + RPC
 docker compose up
 # In another shell:
 curl -sS http://localhost:8080/v1/chat/completions \
