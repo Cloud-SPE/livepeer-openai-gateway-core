@@ -60,6 +60,26 @@ describe('estimateReservation', () => {
     expect(prepaid.maxCompletionTokens).toBe(cfg.defaultMaxTokensPrepaid);
   });
 
+  it('derives fallback prompt estimates from structured message content', () => {
+    const est = estimateReservation(
+      {
+        model: 'model-small',
+        messages: [
+          {
+            role: 'user',
+            content: [
+              { type: 'text', text: 'hello there' },
+              { type: 'image_url', image_url: { url: 'https://example.com/cat.png' } },
+            ],
+          },
+        ],
+      },
+      'prepaid',
+      provider,
+    );
+    expect(est.promptEstimateTokens).toBeGreaterThan(1);
+  });
+
   it('rejects unknown models via ModelNotFoundError', () => {
     expect(() =>
       estimateReservation(
@@ -103,11 +123,7 @@ describe('computeActualCost', () => {
 describe('estimateEmbeddingsReservation', () => {
   it('estimates with a char-div-3 upper bound and model rate', () => {
     // 30 chars / 3 = 10 tokens at $0.025/1M → well below 1¢; result rounds to 0¢
-    const est = estimateEmbeddingsReservation(
-      ['x'.repeat(30)],
-      'text-embedding-3-small',
-      provider,
-    );
+    const est = estimateEmbeddingsReservation(['x'.repeat(30)], 'text-embedding-3-small', provider);
     expect(est.promptEstimateTokens).toBe(10);
     expect(est.estCents).toBe(0n);
   });

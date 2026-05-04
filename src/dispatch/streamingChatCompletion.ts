@@ -11,6 +11,7 @@ import type { QuoteCache } from '../service/routing/quoteCache.js';
 import { capabilityString } from '../types/capability.js';
 import {
   ChatCompletionChunkSchema,
+  chunkDeltaToAuditText,
   type ChatCompletionRequest,
   type Usage,
 } from '../types/openai.js';
@@ -225,9 +226,10 @@ export async function dispatchStreamingChatCompletion(
         continue;
       }
 
-      const delta = chunk.data.choices[0]?.delta.content ?? '';
-      if (delta.length > 0 && !firstTokenDelivered) firstTokenDelivered = true;
-      accumulatedContent += delta;
+      const delta = chunk.data.choices[0]?.delta;
+      const deltaText = delta ? chunkDeltaToAuditText(delta) : '';
+      if (deltaText.length > 0 && !firstTokenDelivered) firstTokenDelivered = true;
+      accumulatedContent += deltaText;
       deps.writeChunk(`data: ${ev.data}\n\n`);
     }
   } catch (err) {

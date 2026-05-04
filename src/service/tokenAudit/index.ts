@@ -1,7 +1,7 @@
 import type { TokenizerProvider } from '../../providers/tokenizer.js';
 import type { MetricsSink } from '../../providers/metrics.js';
 import type { Recorder } from '../../providers/metrics/recorder.js';
-import type { Message } from '../../types/openai.js';
+import { messageToAuditText, type Message } from '../../types/openai.js';
 import { resolveEncodingForModel } from '../../config/tokenizer.js';
 
 export interface TokenAuditService {
@@ -43,7 +43,7 @@ export function createTokenAuditService(deps: TokenAuditDeps): TokenAuditService
         // raw content (role, delimiters). At v1 we observe content tokens
         // only; overhead is consistent within a model and doesn't affect
         // drift comparison on the same basis.
-        total += deps.tokenizer.count(encoding, m.content);
+        total += deps.tokenizer.count(encoding, messageToAuditText(m));
       }
       return total;
     },

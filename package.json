@@ -1,6 +1,6 @@
 {
   "name": "@cloudspe/livepeer-openai-gateway-core",
-  "version": "4.0.1",
+  "version": "4.0.2",
   "description": "OSS engine: registry-driven node selection + payment-daemon orchestration + dispatchers + Fastify adapter for an OpenAI-compatible bridge over Livepeer WorkerNodes.",
   "license": "MIT",
   "homepage": "https://github.com/Cloud-SPE/livepeer-openai-gateway-core",

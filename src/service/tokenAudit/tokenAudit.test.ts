@@ -66,6 +66,25 @@ describe('TokenAuditService (tiktoken)', () => {
     expect(r).toBe(4);
   });
 
+  it('counts structured content and tool metadata without throwing', () => {
+    const r = svc.countPromptTokens('model-small', [
+      {
+        role: 'user',
+        content: [
+          { type: 'text', text: 'hello world' },
+          { type: 'image_url', image_url: { url: 'https://example.com/cat.png' } },
+        ],
+      },
+      {
+        role: 'tool',
+        tool_call_id: 'call_123',
+        content: [{ type: 'text', text: '72 and sunny' }],
+      },
+    ]);
+    expect(r).not.toBeNull();
+    expect(r!).toBeGreaterThan(0);
+  });
+
   it('emitDrift writes histogram + gauges for both directions', () => {
     const captured = capturingSink();
     const s = createTokenAuditService({ tokenizer, metrics: captured });

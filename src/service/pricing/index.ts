@@ -5,7 +5,7 @@
 
 import type { PricingConfig, PricingConfigProvider } from '../../config/pricing.js';
 import type { CustomerTier } from '../../types/tier.js';
-import type { ChatCompletionRequest, Usage } from '../../types/openai.js';
+import { messageToAuditText, type ChatCompletionRequest, type Usage } from '../../types/openai.js';
 import type { ImageQuality, ImageSize, PricingTier } from '../../types/pricing.js';
 import {
   rateForTier,
@@ -21,10 +21,7 @@ import type { TokenAuditService } from '../tokenAudit/index.js';
 const MILLION = 1_000_000n;
 
 /** Resolve `model → tier` for chat, throwing on miss. */
-export function resolveTierForModel(
-  provider: PricingConfigProvider,
-  model: string,
-): PricingTier {
+export function resolveTierForModel(provider: PricingConfigProvider, model: string): PricingTier {
   const tier = resolveChatTier(provider.current(), model);
   if (!tier) throw new ModelNotFoundError(model);
   return tier;
@@ -51,7 +48,10 @@ export function estimateReservation(
   const promptEstimateTokens =
     auditedPrompt !== null
       ? Math.max(1, auditedPrompt)
-      : Math.max(1, Math.ceil(req.messages.reduce((sum, m) => sum + m.content.length, 0) / 3));
+      : Math.max(
+          1,
+          Math.ceil(req.messages.reduce((sum, m) => sum + messageToAuditText(m).length, 0) / 3),
+        );
 
   const defaultMax =
     customerTier === 'free' ? config.defaultMaxTokensFree : config.defaultMaxTokensPrepaid;
@@ -152,10 +152,7 @@ export function computeEmbeddingsActualCost(
   return { actualCents };
 }
 
-function computeInputOnlyCostCents(
-  promptTokens: bigint,
-  inputUsdPerMillion: number,
-): bigint {
+function computeInputOnlyCostCents(promptTokens: bigint, inputUsdPerMillion: number): bigint {
   const inputCentsPerMillion = BigInt(Math.round(inputUsdPerMillion * 100 * 10_000));
   const inputMicro = (promptTokens * inputCentsPerMillion) / MILLION;
   return (inputMicro + 9999n) / 10_000n;

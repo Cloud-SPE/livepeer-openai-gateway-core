@@ -15,9 +15,10 @@ import {
   resolveTierForModel,
 } from '../service/pricing/index.js';
 import { MissingUsageError, UpstreamNodeError } from '../runtime/http/errors.js';
-import type {
-  ChatCompletionRequest,
-  ChatCompletionResponse,
+import {
+  messageToAuditText,
+  type ChatCompletionRequest,
+  type ChatCompletionResponse,
 } from '../types/openai.js';
 import type { TokenAuditService } from '../service/tokenAudit/index.js';
 import type { Recorder } from '../providers/metrics/recorder.js';
@@ -143,8 +144,10 @@ export async function dispatchChatCompletion(
     }
     committed = true;
 
-    const completionText = response.choices.map((c) => c.message.content).join('') ?? '';
-    const localPrompt = deps.tokenAudit?.countPromptTokens(deps.body.model, deps.body.messages) ?? null;
+    const completionText =
+      response.choices.map((c) => messageToAuditText(c.message)).join('') ?? '';
+    const localPrompt =
+      deps.tokenAudit?.countPromptTokens(deps.body.model, deps.body.messages) ?? null;
     const localCompletion =
       deps.tokenAudit?.countCompletionText(deps.body.model, completionText) ?? null;
 
